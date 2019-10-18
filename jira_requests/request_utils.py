@@ -1,8 +1,9 @@
 import os
 import json
 
+
 class RequestUtils:
-    
+
     def get_user_config_data(self):
         config_path = os.path.abspath("./configs/user_config.json")
         user_data = self.get_user_params_file(config_path)
