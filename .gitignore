@@ -1,0 +1,7 @@
+# Data files
+data_defect.json
+data_sprint.json
+
+# Config files
+query_config.json
+user_config.json
