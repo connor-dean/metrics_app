@@ -5,6 +5,8 @@ data_sprint.json
 # Config files
 query_config.json
 user_config.json
+credentials.json
+token.pickle
 
 # Cached files
 __pycache__

@@ -1,6 +1,5 @@
-from response_parser.response_parser import ResponseParser
-from jira_requests.sprint_request import SprintRequest
+from sheets.sheets import Sheets
 
 if __name__ == '__main__':
-    parser = ResponseParser()
-    parser.map_tickets_to_sprints()
+    sheets = Sheets()
+    sheets.update()
