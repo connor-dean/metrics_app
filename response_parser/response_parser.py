@@ -27,9 +27,8 @@ class ResponseParser:
         sprint_response = self.parse_sprint_response()["values"]
         for sprint in sprint_response:
             name = sprint["name"]
-            startDate = sprint["startDate"]
-            endDate = sprint["endDate"]
-
+            startDate = sprint["startDate"] if "startDate" in sprint else "N/A"
+            endDate = sprint["endDate"] if "endDate" in sprint else "N/A"
             sprint = Sprint(name, startDate, endDate)
             sprints.append(sprint)
 
