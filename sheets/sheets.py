@@ -10,6 +10,17 @@ class Sheets:
         sheet_data = self.load_data_to_cell_objects()
         wks.insert_rows(row=0, number=len(sheet_data) + 1, values=sheet_data)
 
+        request_utils = RequestUtils()
+        sheet_data_length = len(sheet_data)
+        header_range = ('A2', 'A{index}'.format(index=sheet_data_length))
+        data_range = [('D2', 'D{index}'.format(
+            index=sheet_data_length)),
+            ('E2', 'E{index}'.format(index=sheet_data_length))]
+        chart_header = request_utils.get_query_data()["chartName"]
+
+        wks.add_chart(header_range, data_range,
+                      chart_header, pygsheets.ChartType.LINE)
+
     def get_worksheet(self):
         gc = pygsheets.authorize()
 
