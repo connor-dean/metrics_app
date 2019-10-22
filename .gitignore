@@ -7,6 +7,8 @@ query_config.json
 user_config.json
 credentials.json
 token.pickle
+client_secret.json
+sheets.googleapis.com-python.json
 
 # Cached files
 __pycache__

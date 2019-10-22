@@ -1,54 +1,37 @@
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-from response_parser.response_parser import ResponseParser
+import pygsheets
 from jira_requests.request_utils import RequestUtils
+from response_parser.response_parser import ResponseParser
 
 
 class Sheets:
 
     def update(self):
-        sheet = self.get_sheet_info()
+        wks = self.get_worksheet()
+        sheet_data = self.load_data_to_cell_objects()
+        wks.insert_rows(row=0, number=len(sheet_data) + 1, values=sheet_data)
 
-        sheet_data = self.load_data_to_cell_objects(sheet)
-
-        # TODO see if we can genericize this in the config file
-        wow_formula = '=SUM(D2:D{index})/COUNT(D2:D{index})'
-
-        row_index = 1
-        while row_index - 1 < len(sheet_data):
-            print('Writing to sheet ...') if row_index == 1 else print(
-                sheet_data[row_index - 1])
-
-            sheet.insert_row(sheet_data[row_index - 1], row_index)
-
-            # Appending formulas to a Cell object will return it with a prepended
-            # ', which results in the sheet not reading the formula
-            if row_index > 1:
-                sheet.update_cell(
-                    row_index, 5, wow_formula.format(index=row_index))
-
-            row_index += 1
-
-        print('The sheet has been updated successfully.')
-
-    def get_sheet_info(self):
-        scope = ['https://spreadsheets.google.com/feeds',
-                 'https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name(
-            'credentials.json', scope)
-        client = gspread.authorize(creds)
+    def get_worksheet(self):
+        gc = pygsheets.authorize()
 
         request_utils = RequestUtils()
         sheet_name = request_utils.get_query_data()["sheetName"]
 
-        return client.open(sheet_name).sheet1
+        sh = gc.open(sheet_name)
+        return sh.sheet1
 
-    def load_data_to_cell_objects(self, sheet):
+    def get_headers(self):
+        request_utils = RequestUtils()
+        return request_utils.get_query_data(
+        )["headers"]
+
+    def load_data_to_cell_objects(self):
         sheet_data = []
-        sheet_data.append(self.get_headers(sheet))
+        sheet_data.append(self.get_headers())
 
         response_parser = ResponseParser()
         sprint_data = response_parser.map_tickets_to_sprints()
+
+        wow_formula = '=SUM(D2:D{index})/COUNT(D2:D{index})'
 
         index = 1
         for sprint in sprint_data:
@@ -58,11 +41,7 @@ class Sheets:
             row_data.append(sprint.start_date.split('T')[0])
             row_data.append(sprint.end_date.split('T')[0])
             row_data.append(len(sprint.Ticket))
+            row_data.append(wow_formula.format(index=index))
             sheet_data.append(row_data)
 
         return sheet_data
-
-    def get_headers(self, sheet):
-        request_utils = RequestUtils()
-        return request_utils.get_query_data(
-        )["headers"]
