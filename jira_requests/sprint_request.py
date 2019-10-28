@@ -1,4 +1,4 @@
-from .request_utils import RequestUtils
+from .config_utils import ConfigUtils
 import json
 import requests
 
@@ -6,14 +6,15 @@ import requests
 class SprintRequest:
 
     def make_sprint_request(self):
-        utils = RequestUtils()
-
+        utils = ConfigUtils()
         user_data = utils.get_user_config_data()
-        username = user_data["username"]
-        auth_token = user_data["authToken"]
+        username = user_data['username']
+        auth_token = user_data['authToken']
 
-        query_data = utils.get_query_data()
-        api = query_data["sprintApi"]
+        query_data = utils.get_query_config_data()
+        project_num = query_data['projectNum']
+        api = 'https://hudl-jira.atlassian.net/rest/agile/1.0/board/{project_num}/sprint'.format(
+            project_num=project_num)
 
         response = requests.get(api, auth=(username, auth_token)).json()
 

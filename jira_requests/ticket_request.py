@@ -1,20 +1,20 @@
-from .request_utils import RequestUtils
+from .config_utils import ConfigUtils
 import requests
 import json
 
 
 class TicketRequest:
 
-    def make_ticket_request(self):
-        utils = RequestUtils()
+    def make_ticket_request(self, query):
+        utils = ConfigUtils()
 
         user_data = utils.get_user_config_data()
-        username = user_data["username"]
-        auth_token = user_data["authToken"]
+        username = user_data['username']
+        auth_token = user_data['authToken']
 
-        query_data = utils.get_query_data()
-        api = query_data["ticketApi"]
-        jql = query_data["ticketJql"]
+        query_data = utils.get_query_config_data()
+        api = query_data['ticketApi']
+        jql = query.ticket_jql
 
         params = (
             ('jql', jql),

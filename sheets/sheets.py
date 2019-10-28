@@ -1,46 +1,40 @@
 import pygsheets
-from jira_requests.request_utils import RequestUtils
+from jira_requests.config_utils import ConfigUtils
 from response_parser.response_parser import ResponseParser
 
 
 class Sheets:
 
     def update(self):
-        wks = self.get_worksheet()
-        sheet_data = self.load_data_to_cell_objects()
-        wks.insert_rows(row=0, number=len(sheet_data) + 1, values=sheet_data)
+        response_parser = ResponseParser()
+        sheets = response_parser.map_sheets_to_sheets()
+        for sheet in sheets:
+            self.write_sheet(sheet)
 
-        request_utils = RequestUtils()
-        sheet_data_length = len(sheet_data)
-        header_range = ('A2', 'A{index}'.format(index=sheet_data_length))
-        data_range = [('D2', 'D{index}'.format(
-            index=sheet_data_length)),
-            ('E2', 'E{index}'.format(index=sheet_data_length))]
-        chart_header = request_utils.get_query_data()["chartName"]
+    def write_sheet(self, sheet):
+        client = pygsheets.authorize()
+        config_utils = ConfigUtils()
+        sheet_name = config_utils.get_query_config_data()['worksheetName']
 
-        wks.add_chart(header_range, data_range,
-                      chart_header, pygsheets.ChartType.LINE)
+        worksheet = client.open(sheet_name)
+        try:
+            worksheet.add_worksheet(sheet.name)
+        except:
+            print(
+                f'*** Sheet already exists, updating sheet {sheet.name}. ***')
 
-    def get_worksheet(self):
-        gc = pygsheets.authorize()
+        working_sheet = worksheet.worksheet_by_title(sheet.name)
+        sheet_data = self.load_data_to_cell_objects(sheet)
+        working_sheet.insert_rows(row=0, number=len(
+            sheet_data) + 1, values=sheet_data)
+        self.create_chart(working_sheet, sheet_data, sheet.chart_title)
 
-        request_utils = RequestUtils()
-        sheet_name = request_utils.get_query_data()["sheetName"]
-
-        sh = gc.open(sheet_name)
-        return sh.sheet1
-
-    def get_headers(self):
-        request_utils = RequestUtils()
-        return request_utils.get_query_data(
-        )["headers"]
-
-    def load_data_to_cell_objects(self):
+    def load_data_to_cell_objects(self, query):
         sheet_data = []
-        sheet_data.append(self.get_headers())
+        sheet_data.append(query.headers)
 
         response_parser = ResponseParser()
-        sprint_data = response_parser.map_tickets_to_sprints()
+        sprint_data = response_parser.map_tickets_to_sprints(query)
 
         wow_formula = '=SUM(D2:D{index})/COUNT(D2:D{index})'
 
@@ -56,3 +50,14 @@ class Sheets:
             sheet_data.append(row_data)
 
         return sheet_data
+
+    def create_chart(self, wks, sheet_data, chart_title):
+        config_utils = ConfigUtils()
+        sheet_data_length = len(sheet_data)
+        sprint_range = ('A2', 'A{index}'.format(index=sheet_data_length))
+        data_range = [('D2', 'D{index}'.format(
+            index=sheet_data_length)),
+            ('E2', 'E{index}'.format(index=sheet_data_length))]
+
+        wks.add_chart(sprint_range, data_range,
+                      chart_title, pygsheets.ChartType.LINE)

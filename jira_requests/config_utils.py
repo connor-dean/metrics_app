@@ -2,15 +2,15 @@ import os
 import json
 
 
-class RequestUtils:
+class ConfigUtils:
 
     def get_user_config_data(self):
-        config_path = os.path.abspath("./configs/user_config.json")
+        config_path = os.path.abspath('./configs/user_config.json')
         user_data = self.get_user_params_file(config_path)
         return user_data
 
-    def get_query_data(self):
-        param_path = os.path.abspath("./configs/query_config.json")
+    def get_query_config_data(self):
+        param_path = os.path.abspath('./configs/query_config.json')
         query_data = self.get_user_params_file(param_path)
         return query_data
 
