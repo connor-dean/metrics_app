@@ -15,15 +15,16 @@ class Sheets:
         client = pygsheets.authorize()
         config_utils = ConfigUtils()
         sheet_name = config_utils.get_query_config_data()['worksheetName']
-
         worksheet = client.open(sheet_name)
         try:
             worksheet.add_worksheet(sheet.name)
         except:
             print(
-                f'*** Sheet already exists, updating sheet {sheet.name}. ***')
+                f'\n*** Sheet already exists, updating sheet {sheet.name}. ***')
 
         working_sheet = worksheet.worksheet_by_title(sheet.name)
+        working_sheet.clear()
+
         sheet_data = self.load_data_to_cell_objects(sheet)
         working_sheet.insert_rows(row=0, number=len(
             sheet_data) + 1, values=sheet_data)
@@ -51,7 +52,7 @@ class Sheets:
 
         return sheet_data
 
-    def create_chart(self, wks, sheet_data, chart_title):
+    def create_chart(self, worksheet, sheet_data, chart_title):
         config_utils = ConfigUtils()
         sheet_data_length = len(sheet_data)
         sprint_range = ('A2', 'A{index}'.format(index=sheet_data_length))
@@ -59,5 +60,5 @@ class Sheets:
             index=sheet_data_length)),
             ('E2', 'E{index}'.format(index=sheet_data_length))]
 
-        wks.add_chart(sprint_range, data_range,
-                      chart_title, pygsheets.ChartType.LINE)
+        worksheet.add_chart(sprint_range, data_range,
+                            chart_title, pygsheets.ChartType.LINE)

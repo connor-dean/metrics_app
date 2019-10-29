@@ -16,9 +16,12 @@ class SprintRequest:
         api = 'https://hudl-jira.atlassian.net/rest/agile/1.0/board/{project_num}/sprint'.format(
             project_num=project_num)
 
-        response = requests.get(api, auth=(username, auth_token)).json()
-
-        with open('data_sprint.json', 'w') as outfile:
-            json.dump(response, outfile)
+        try:
+            response = requests.get(api, auth=(username, auth_token)).json()
+            with open('data_sprint.json', 'w') as outfile:
+                json.dump(response, outfile)
+        except:
+            print(
+                'Something went wrong requesting sprint information. Is your board # correct?')
 
         return response

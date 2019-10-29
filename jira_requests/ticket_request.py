@@ -20,10 +20,13 @@ class TicketRequest:
             ('jql', jql),
         )
 
-        response = requests.get(
-            api, params=params, auth=(username, auth_token)).json()
-
-        with open('data_ticket.json', 'w') as outfile:
-            json.dump(response, outfile)
+        try:
+            response = requests.get(
+                api, params=params, auth=(username, auth_token)).json()
+            with open('data_ticket.json', 'w') as outfile:
+                json.dump(response, outfile)
+        except:
+            print(
+                'Something went wrong requesting ticket information. Is your ticket API url correct?')
 
         return response
