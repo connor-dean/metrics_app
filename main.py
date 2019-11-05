@@ -1,5 +1,4 @@
-from sheets.sheets import Sheets
+from sheets_runner.sheets_runner import update_worksheet
 
 if __name__ == '__main__':
-    sheet = Sheets()
-    sheet.update()
+    update_worksheet()
