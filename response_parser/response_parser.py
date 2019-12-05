@@ -51,7 +51,6 @@ def parse_response_to_sprints():
         endDate = sprint['endDate'] if 'endDate' in sprint else 'N/A'
         sprint = Sprint(name, startDate, endDate)
         sprints.append(sprint)
-        import pprint
         pprint.pprint(vars(sprint))
 
     return sprints
@@ -70,7 +69,6 @@ def parse_response_to_tickets(query):
         created = ticket['fields']['created']
         ticket = Ticket(issue, title, labels, created)
         tickets.append(ticket)
-        import pprint
         pprint.pprint(vars(ticket))
 
     return tickets

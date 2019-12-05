@@ -52,7 +52,6 @@ def get_user_config_data():
     try:
         config_path = os.path.abspath('./configs/user_config.json')
         user_data = get_user_params_file(config_path)
-
     except:
         print('Unable to locate the user_config.json file. Do you have one created in the root of the directory?')
 
